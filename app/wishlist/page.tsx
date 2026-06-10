@@ -22,10 +22,13 @@ async function fetchWishlistBooks(): Promise<SearchBooksResult> {
 export default function WishlistPage() {
   const router = useRouter()
 
-  const { data, isLoading, error } = useQuery({
+  const { data, error, isFetching } = useQuery({
     queryKey: ["wishlist"],
     queryFn: fetchWishlistBooks,
   })
+
+  const isInitialLoading = !data && !error
+  const isRefetching = isFetching && !!data
 
   return (
     <div className="min-h-svh bg-secondary px-4 py-8">
@@ -45,22 +48,30 @@ export default function WishlistPage() {
           </h1>
         </div>
         <div className="h-6" />
-        {isLoading && (
+        {isInitialLoading && (
           <ul className="space-y-4">
             {Array.from({ length: 3 }).map((_, index) => (
               <BookResultSkeleton key={index} />
             ))}
           </ul>
         )}
-        {!isLoading && error && <p>Failed to load wishlist. {error.message}</p>}
-        {!isLoading && !error && data?.items.length === 0 && (
+        {!isInitialLoading && error && (
+          <p>Failed to load wishlist. {error.message}</p>
+        )}
+        {!isInitialLoading && !error && data?.items.length === 0 && !isRefetching && (
           <SearchEmpty message="Your wishlist is empty" />
         )}
-        {!isLoading && data && data.items.length > 0 && (
+        {!isInitialLoading && !error && isRefetching && data?.items.length === 0 && (
+          <ul className="space-y-4">
+            <BookResultSkeleton />
+          </ul>
+        )}
+        {data && data.items.length > 0 && (
           <ul className="space-y-4">
             {data.items.map((book) => (
               <BookResult key={book.id} book={book} />
             ))}
+            {isRefetching && <BookResultSkeleton />}
           </ul>
         )}
       </div>

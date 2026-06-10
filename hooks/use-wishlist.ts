@@ -73,17 +73,44 @@ export function useWishlist() {
       )
 
       queryClient.setQueryData<SearchBooksResult>(["wishlist"], (current) => {
-        if (!current) {
-          return current
-        }
-
         if (isWishlisted) {
+          if (!current) {
+            return current
+          }
+
           return {
             items: current.items.filter((item) => item.id !== bookId),
           }
         }
 
-        return current
+        const booksQueries = queryClient.getQueriesData<SearchBooksResult>({
+          queryKey: ["books"],
+        })
+
+        let book: SearchBooksResult["items"][number] | undefined
+
+        for (const [, booksData] of booksQueries) {
+          book = booksData?.items.find((item) => item.id === bookId)
+          if (book) {
+            break
+          }
+        }
+
+        if (!book) {
+          return current
+        }
+
+        const wishlistedBook = { ...book, isWishlisted: true }
+
+        if (!current) {
+          return { items: [wishlistedBook] }
+        }
+
+        if (current.items.some((item) => item.id === bookId)) {
+          return current
+        }
+
+        return { items: [...current.items, wishlistedBook] }
       })
 
       return { previousBooks, previousWishlist }
