@@ -8,6 +8,7 @@ import { SearchBooksResult } from "@/lib/gcloud/types"
 import { useDebounce } from "@uidotdev/usehooks"
 import { useQuery } from "@tanstack/react-query"
 import { parseAsString, useQueryState } from "nuqs"
+import { Suspense } from "react"
 
 async function fetchBooks(query: string): Promise<SearchBooksResult> {
   const response = await fetch(`/api/books?q=${encodeURIComponent(query)}`)
@@ -19,7 +20,23 @@ async function fetchBooks(query: string): Promise<SearchBooksResult> {
   return response.json()
 }
 
-export default function SearchPage() {
+function SearchPageFallback() {
+  return (
+    <div className="min-h-svh bg-secondary px-4 py-8">
+      <div className="mx-auto w-full max-w-2xl">
+        <SearchInput value="" onChange={() => {}} />
+        <div className="h-4" />
+        <ul className="space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <BookResultSkeleton key={index} />
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+function SearchPageContent() {
   const [query, setQuery] = useQueryState(
     "q",
     parseAsString.withDefault("").withOptions({ shallow: false })
@@ -66,5 +83,13 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<SearchPageFallback />}>
+      <SearchPageContent />
+    </Suspense>
   )
 }
