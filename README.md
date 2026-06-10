@@ -91,14 +91,6 @@ Build the image:
 just docker-build
 ```
 
-Run the container (Postgres must already be running via `just services`):
-
-```bash
-just docker-run
-```
-
-`just docker-run` loads `.env` and rewrites `localhost` to `host.docker.internal` in `DATABASE_URL` so the app container can reach Postgres on your machine.
-
 The Docker image sets `OUTPUT_MODE=standalone` at build time. Vercel deployments do not set this and use the default Next.js output.
 
 ## Commands
@@ -116,7 +108,6 @@ The Docker image sets `OUTPUT_MODE=standalone` at build time. Vercel deployments
 | `just db-generate` | Generate a migration from schema changes |
 | `just db-push` | Push schema directly (dev only) |
 | `just docker-build` | Build the app Docker image |
-| `just docker-run` | Run the app in Docker |
 
 ## Deploying to Vercel
 
