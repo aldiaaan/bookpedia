@@ -2,6 +2,7 @@
 
 import { BookResult } from "@/components/search/book-result"
 import { BookResultSkeleton } from "@/components/search/book-result-skeleton"
+import { SearchInputSkeleton } from "@/components/search/search-input-skeleton"
 import { SearchEmpty } from "@/components/search/search-empty"
 import { SearchInput } from "@/components/search/search-input"
 import { SearchBooksResult } from "@/lib/gcloud/types"
@@ -24,7 +25,7 @@ function SearchPageFallback() {
   return (
     <div className="min-h-svh bg-secondary px-4 py-8">
       <div className="mx-auto w-full max-w-2xl">
-        <SearchInput value="" onChange={() => {}} />
+        <SearchInputSkeleton />
         <div className="h-4" />
         <ul className="space-y-4">
           {Array.from({ length: 3 }).map((_, index) => (
