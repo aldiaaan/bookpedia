@@ -17,7 +17,7 @@ export function proxy(request: NextRequest) {
     name: SESSION_COOKIE_NAME,
     value: sesionId,
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 30,
     path: "/",
     sameSite: "lax",
