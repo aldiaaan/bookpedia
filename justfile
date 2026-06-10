@@ -1,8 +1,17 @@
 compose_file := "infra/docker-compose.local.yml"
 image_name := "bookpedia"
 
+install:
+    pnpm install
+
 dev:
     pnpm dev
+
+build:
+    pnpm build
+
+start:
+    pnpm start
 
 services:
     docker compose -f {{compose_file}} up -d
