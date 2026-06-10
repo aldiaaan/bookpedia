@@ -5,13 +5,28 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
-  const query = new URL(request.url).searchParams.get("q")
+  const { searchParams } = new URL(request.url)
+  const query = searchParams.get("q")
+  const idsParam = searchParams.get("ids")
 
-  if (!query) {
-    return NextResponse.json({ error: "Missing q parameter" }, { status: 400 })
+  let result: Awaited<ReturnType<typeof searchBooks>>
+
+  if (idsParam) {
+    const ids = idsParam.split(",").map((id) => id.trim()).filter(Boolean)
+
+    if (ids.length === 0) {
+      return NextResponse.json({ error: "Invalid ids parameter" }, { status: 400 })
+    }
+
+    result = await searchBooks({ ids })
+  } else if (query) {
+    result = await searchBooks({ query })
+  } else {
+    return NextResponse.json(
+      { error: "Missing q or ids parameter" },
+      { status: 400 }
+    )
   }
-
-  const result = await searchBooks({ query })
   const sessionId = (await cookies()).get(SESSION_COOKIE_NAME)?.value
   const wishlistBookIds = sessionId
     ? await getWishlistBookIds(sessionId)

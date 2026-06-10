@@ -45,10 +45,15 @@ export function useWishlist() {
     },
     onMutate: async ({ bookId, isWishlisted }) => {
       await queryClient.cancelQueries({ queryKey: ["books"] })
+      await queryClient.cancelQueries({ queryKey: ["wishlist"] })
 
-      const previous = queryClient.getQueriesData<SearchBooksResult>({
+      const previousBooks = queryClient.getQueriesData<SearchBooksResult>({
         queryKey: ["books"],
       })
+
+      const previousWishlist = queryClient.getQueryData<SearchBooksResult>([
+        "wishlist",
+      ])
 
       queryClient.setQueriesData<SearchBooksResult>(
         { queryKey: ["books"] },
@@ -67,15 +72,34 @@ export function useWishlist() {
         }
       )
 
-      return { previous }
+      queryClient.setQueryData<SearchBooksResult>(["wishlist"], (current) => {
+        if (!current) {
+          return current
+        }
+
+        if (isWishlisted) {
+          return {
+            items: current.items.filter((item) => item.id !== bookId),
+          }
+        }
+
+        return current
+      })
+
+      return { previousBooks, previousWishlist }
     },
     onError: (_error, _variables, context) => {
-      context?.previous.forEach(([queryKey, data]) => {
+      context?.previousBooks.forEach(([queryKey, data]) => {
         queryClient.setQueryData(queryKey, data)
       })
+
+      if (context?.previousWishlist) {
+        queryClient.setQueryData(["wishlist"], context.previousWishlist)
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] })
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] })
     },
   })
 

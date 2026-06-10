@@ -14,9 +14,9 @@ export type SearchBooksResult = {
   items: (SearchBook & { isWishlisted: boolean })[]
 }
 
-export type SearchBooksOptions = {
-  query: string
-}
+export type SearchBooksOptions =
+  | { query: string }
+  | { ids: string[] }
 
 export type GoogleBooksVolume = {
   id: string
