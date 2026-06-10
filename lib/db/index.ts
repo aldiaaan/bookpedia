@@ -6,14 +6,11 @@ import { Pool as NeonPool } from "@neondatabase/serverless"
 import { singleton } from "@/lib/utils"
 import * as schema from "./schema"
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is missing!")
-}
-
-const databaseUrl = process.env.DATABASE_URL
-const isNeon = databaseUrl.includes("neon.tech")
-
 export const db = singleton("db", () => {
+  const databaseUrl = process.env.DATABASE_URL
+
+  const isNeon = databaseUrl?.includes("neon.tech")
+
   if (isNeon) {
     const pool = new NeonPool({ connectionString: databaseUrl })
     return drizzleNeon(pool, { schema })

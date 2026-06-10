@@ -1,4 +1,5 @@
 compose_file := "infra/docker-compose.local.yml"
+image_name := "bookpedia"
 
 dev:
     pnpm dev
@@ -11,6 +12,15 @@ services-down:
 
 clean: services-down
     rm -rf infra/.tmp
+
+docker-build:
+    docker build -t {{image_name}} .
+
+docker-run:
+    docker run --rm -p 3000:3000 \
+        --env-file .env \
+        -e "$(grep '^DATABASE_URL=' .env | sed 's/localhost/host.docker.internal/')" \
+        {{image_name}}
 
 db-push:
     pnpm exec drizzle-kit push
