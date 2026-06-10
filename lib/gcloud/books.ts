@@ -1,7 +1,7 @@
 import {
   GoogleBooksResponse,
+  SearchBook,
   SearchBooksOptions,
-  SearchBooksResult,
 } from "./types"
 
 const GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes"
@@ -9,7 +9,7 @@ const GOOGLE_CLOUD_API_KEY = process.env.GOOGLE_CLOUD_API_KEY!
 
 export async function searchBooks(
   options: SearchBooksOptions
-): Promise<SearchBooksResult> {
+): Promise<{ items: SearchBook[] }> {
   const url = new URL(GOOGLE_BOOKS_API_URL)
   url.searchParams.set("q", options.query)
   url.searchParams.set("key", GOOGLE_CLOUD_API_KEY)

@@ -1,6 +1,10 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { useWishlist } from "@/hooks/use-wishlist"
 import { SearchBooksResult } from "@/lib/gcloud/types"
 import { cn } from "@/lib/utils"
-import { Star } from "lucide-react"
+import { Heart, Star } from "lucide-react"
 
 export type BookResultProps = {
   book: SearchBooksResult["items"][number]
@@ -42,6 +46,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function BookResult({ book }: BookResultProps) {
+  const { toggleWishlist, isToggling } = useWishlist()
   const image = book.images.thumbnail || book.images.sm
 
   return (
@@ -53,7 +58,7 @@ export function BookResult({ book }: BookResultProps) {
           className="aspect-[2/3] h-48 shrink-0 rounded object-cover"
         />
       )}
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <h2 className="font-serif text-xl leading-tight font-bold">
           {book.title}
         </h2>
@@ -64,6 +69,26 @@ export function BookResult({ book }: BookResultProps) {
         )}
         <StarRating rating={book.averageRating} />
       </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="shrink-0 self-start"
+        disabled={isToggling(book.id)}
+        aria-label={
+          book.isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+        }
+        onClick={() => toggleWishlist(book.id, book.isWishlisted)}
+      >
+        <Heart
+          className={cn(
+            "size-5",
+            book.isWishlisted
+              ? "fill-primary text-primary"
+              : "text-muted-foreground"
+          )}
+        />
+      </Button>
     </li>
   )
 }

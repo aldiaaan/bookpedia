@@ -1,6 +1,5 @@
+import { SESSION_COOKIE_NAME } from "@/lib/session"
 import { NextRequest, NextResponse } from "next/server"
-
-const SESSION_COOKIE_NAME = "session_id"
 
 export function proxy(request: NextRequest) {
   const hasSession = request.cookies.get(SESSION_COOKIE_NAME)

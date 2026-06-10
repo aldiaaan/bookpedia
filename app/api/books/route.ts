@@ -1,4 +1,7 @@
+import { getWishlistBookIds } from "@/lib/db/queries"
 import { searchBooks } from "@/lib/gcloud/books"
+import { SESSION_COOKIE_NAME } from "@/lib/session"
+import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
@@ -9,6 +12,16 @@ export async function GET(request: Request) {
   }
 
   const result = await searchBooks({ query })
+  const sessionId = (await cookies()).get(SESSION_COOKIE_NAME)?.value
+  const wishlistBookIds = sessionId
+    ? await getWishlistBookIds(sessionId)
+    : []
+  const wishlistSet = new Set(wishlistBookIds)
 
-  return NextResponse.json(result)
+  return NextResponse.json({
+    items: result.items.map((item) => ({
+      ...item,
+      isWishlisted: wishlistSet.has(item.id),
+    })),
+  })
 }
